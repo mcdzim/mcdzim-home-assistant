@@ -1,9 +1,146 @@
-# https://community.victronenergy.com/questions/78971/home-assistant-modbus-integration-tutorial.html
+# BMV-700 : 224
+# Victorn hub : 100
+# Solar charger : 226, 238, 237, 236
+# Multiplus : 227
+# Grid meter : 30
+
+
 
 # modbus:
   - name: victron
     type: tcp
-    retry_on_empty: true
-    retries: 10
     host: 192.168.1.104  # use the IP address of your CCGX
     port: 502
+    sensors:
+      - name: "Grid L1 Voltage"
+        scan_interval: 10
+        unit_of_measurement: "V"
+        slave: 30
+        address: 2616
+        scale: 0.1
+
+      - name: "Grid L1"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 820
+        unique_id: grid_l1
+        device_class: power
+ 
+      - name: "Grid L2"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 821
+        unique_id: grid_l2
+        device_class: power
+ 
+      - name: "Grid L3"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 822
+        unique_id: grid_l3
+        device_class: power
+
+      - name: "Battery Power"
+        data_type: int16
+        unit_of_measurement: "W"
+        slave: 100
+        address: 842
+        scale: 1
+        unique_id: battery_discharged_energy1
+        device_class: power
+
+      - name: "PV Power"
+        data_type: uint16
+        unit_of_measurement: "W"
+        slave: 100
+        address: 850
+        scale: 1
+        device_class: power
+
+      - name: "AC Consumption L1"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 817
+        device_class: power
+        
+      - name: "AC Consumption L2"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 818
+        device_class: power
+        
+      - name: "AC Consumption L3"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 819
+        device_class: power
+        
+      - name: "PV Power"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 850
+        device_class: power
+
+      - name: "ESS State"
+        scan_interval: 10
+        slave: 100
+        address: 2900
+
+      - name: "Battery SoC"
+        scan_interval: 10
+        slave: 100
+        address: 843
+            
+      # SYSTEM
+      - name: Inverter State
+        slave: 227
+        address: 33
+        data_type: uint16
+        scale: 1
+
+      - name: "Victron Power Source"
+        data_type: int16
+        slave: 100
+        address: 826
+        scale: 1
+
+      - name: 'ESS Minimum SoC setpoint'
+        unit_of_measurement: "%"
+        slave: 100
+        address: 2901
+        scale: 0.1
+
+      - name: 'Battery State of Charge'
+        unit_of_measurement: "%"
+        slave: 224
+        address: 266
+        scale: 0.1
+        precision: 0
+
+      - name: "Battery Discharged Energy"
+        scan_interval: 10
+        slave: 224
+        address: 301
+        unique_id: battery_discharged_energy1
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
+
+      - name: "Battery Charged Energy"
+        scan_interval: 10
+        slave: 224
+        address: 302
+        unique_id: battery_charged_energy1
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
+
+      
+      

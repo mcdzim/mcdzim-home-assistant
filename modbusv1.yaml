@@ -82,6 +82,7 @@
         scan_interval: 10
         unit_of_measurement: "%"
         slave: 100
+        scale: 0.1
         address: 2901
         
       # - name: "Inverter State"

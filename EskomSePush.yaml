@@ -1,0 +1,11 @@
+#Amber power price 
+  - platform: command_line  
+    command: 'curl -X POST \ https://api.amberelectric.com.au/prices/listprices \ -H "Content-Type: application/json" \ -d { "postcode": "5555" } '
+    name: power_price
+    unit_of_measurement: '$'
+    json_attributes:
+      - data.staticPrices.E1.totalfixedKWHPrice
+      - data.staticPrices.E1.lossFactor
+      - data.variablePricesAndRenewables.[period].wholesaleKWHPrice
+    scan_interval: 20
+    command_timeout: 30

@@ -1,6 +1,6 @@
-sensor:
 
 # Sensors for energy dashboard
+sensor:
   - platform: template
     sensors:
       battery_discharge_power:
@@ -14,15 +14,16 @@ sensor:
         friendly_name: "Battery Charge"
         unit_of_measurement: "W"
         value_template: "{{ max(0, states('sensor.battery_power') | float) }}"
-        
-  # - platform: integration
-  #   source: sensor.battery_charge_power
-  #   name: Battery Charge
-  #   unit_prefix: k
-  #   round: 2
 
-  # - platform: integration
-  #   source: sensor.battery_discharge_power
-  #   name: Battery Discharge
-  #   unit_prefix: k
-  #   round: 2
+  - platform: integration
+    source: sensor.battery_charge_power
+    name: Battery Charge Energy
+    unit_prefix: k
+    round: 2
+
+  - platform: integration
+    source: sensor.battery_discharge_power
+    name: Battery Discharge Energy
+    unit_prefix: k
+    round: 2
+
