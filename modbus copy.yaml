@@ -1,0 +1,160 @@
+# https://community.victronenergy.com/questions/78971/home-assistant-modbus-integration-tutorial.html
+
+# modbus:
+  - name: victron
+    type: tcp
+    host: 192.168.1.104  # use the IP address of your CCGX
+    port: 502
+    sensors:
+      - name: "Grid L1 – Voltage"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 2616
+
+      - name: "Grid L1"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 820
+
+      - name: "Grid L2"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 821
+
+      - name: "Grid L3"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 822
+
+      - name: "AC Consumption L1"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 817
+        
+      - name: "AC Consumption L2"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 818
+        
+      - name: "AC Consumption L3"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 819
+        
+      - name: "PV Power"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 850
+
+      - name: "ESS State"
+        scan_interval: 10
+        slave: 100
+        address: 2900
+
+      - name: "Battery SoC"
+        scan_interval: 10
+        slave: 100
+        address: 843
+        
+      - name: "Battery Discharged Energy"
+        scan_interval: 10
+        slave: 100
+        address: 301
+
+      - name: "Battery Charged Energy"
+        scan_interval: 10
+        slave: 100
+        address: 302
+
+      - name: "Battery Power"
+        scan_interval: 10
+        unit_of_measurement: "W"
+        slave: 100
+        address: 842
+        
+  
+  # # Victron device over Modbus: Revov Battery 
+  #     - name: 'Battery current'
+  #       unit_of_measurement: "A DC"
+  #       slave: 225
+  #       register: 261
+  #       register_type: input  
+  #       scale: 0.1
+  #       precision: 0
+  
+  #     - name: 'Battery State of Charge'
+  #       unit_of_measurement: "%"
+  #       slave: 225
+  #       register: 266
+  #       register_type: input  
+  #       scale: 0.1
+  #       precision: 0
+        
+  # # Victron device over Modbus: vebus
+  #     - name: 'Multiplus Critical Loads'
+  #       unit_of_measurement: "W"
+  #       slave: 246
+  #       register: 23
+  #       register_type: input  
+  #       scale: 10.0
+  #       precision: 0  
+        
+  #     - name: 'Grid Voltage L1 in'
+  #       unit_of_measurement: "V AC"
+  #       slave: 246
+  #       register: 3
+  #       register_type: input  
+  #       scale: 0.1
+  #       offset: 0
+  #       precision: 2
+
+  #     - name: 'Multi Voltage L1 out'
+  #       unit_of_measurement: "V AC"
+  #       slave: 246
+  #       register: 15      
+  #       scale: 0.1
+  #       offset: 0
+  #       precision: 2 
+
+      # - name: 'Grid lost alarm'
+      #   unit_of_measurement: "on/off"
+      #   slave: 246
+      #   register: 64        
+
+      # - name: "Multi Inverter State"
+      #   slave: 246
+      #   register: 31
+        # Inverter States, 0=Off;1=Low Power;2=Fault;3=Bulk;4=Absorption;5=Float;6=Storage;7=Equalize;8=Passthru;9=Inverting;10=Power assist;11=Power supply;252=Bulk protection   
+        #  com.victronenergy.solarcharger slave: 247
+
+      # - name: 'Solar Yield today'
+      #   unit_of_measurement: "kWh"
+      #   slave: 247
+      #   register: 784
+      #   data_type: uint
+      #   scale: 0.1
+      #   precision: 1 
+
+      # - name: 'Solar Yield yesterday'
+      #   unit_of_measurement: "kWh"
+      #   slave: 247
+      #   register: 786
+      #   data_type: uint 
+      #   scale: 0.1
+      #   precision: 1
+      
+
+      # - name: 'ESS Minimum SoC setpoint'
+      #   unit_of_measurement: "%"
+      #   data_type: uint
+      #   slave: 100
+      #   register: 2901
+      #   scale: 0.1

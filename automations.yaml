@@ -1,0 +1,198 @@
+- id: '1664547251903'
+  alias: Batteries Full
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.battery_soc
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+    above: 95
+  condition: []
+  action:
+  - service: notify.mobile_app_pixel_4a
+    data:
+      message: Solar batteries ful
+  - type: turn_on
+    device_id: 14520646a7b065a7fa510cdccd5dea40
+    entity_id: light.downstairs_geyser
+    domain: light
+    enabled: false
+  - type: turn_on
+    device_id: 0dba7e966968f9e566d505b99aef0a61
+    entity_id: light.pool_control
+    domain: light
+  - type: turn_on
+    device_id: 95884cc3a94bd29a6b94d707f51f15b8
+    entity_id: light.coldroom_relay
+    domain: light
+  mode: single
+- id: '1664547314497'
+  alias: Loadshedding detector
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.grid_l1
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    below: 1
+    above: -1
+  condition: []
+  action:
+  - service: notify.mobile_app_pixel_4a
+    data:
+      message: Loadshedding
+  - type: turn_off
+    device_id: 14520646a7b065a7fa510cdccd5dea40
+    entity_id: light.downstairs_geyser
+    domain: light
+    enabled: false
+  - type: turn_off
+    device_id: 0dba7e966968f9e566d505b99aef0a61
+    entity_id: light.pool_control
+    domain: light
+    enabled: false
+  mode: single
+- id: '1664556919401'
+  alias: Enter Davies
+  description: ''
+  trigger:
+  - platform: zone
+    entity_id: device_tracker.mikes_pixel
+    zone: zone.davies
+    event: enter
+  condition: []
+  action:
+  - service: notify.mobile_app_pixel_4a
+    data:
+      message: Left Davies
+  mode: single
+- id: '1664814557200'
+  alias: Batteries Low
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.battery_soc
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+    below: 50
+  condition: []
+  action:
+  - service: notify.mobile_app_pixel_4a
+    data:
+      message: Solar batteries empty
+  - type: turn_off
+    device_id: 14520646a7b065a7fa510cdccd5dea40
+    entity_id: light.downstairs_geyser
+    domain: light
+  - type: turn_off
+    device_id: 0dba7e966968f9e566d505b99aef0a61
+    entity_id: light.pool_control
+    domain: light
+  - type: turn_off
+    device_id: 95884cc3a94bd29a6b94d707f51f15b8
+    entity_id: light.coldroom_relay
+    domain: light
+  mode: single
+- id: '1664814681060'
+  alias: Sunset
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunset
+    offset: '-30'
+  condition: []
+  action: []
+  mode: single
+- id: '1665398909616'
+  alias: Home Assistant Auto-update
+  description: ''
+  use_blueprint:
+    path: EdwardTFN/auto-update-home-assistant.yaml
+    input:
+      schedule_monthday: 16
+- id: '1665475553748'
+  alias: Luka in Harare
+  description: ''
+  trigger:
+  - platform: device
+    device_id: 148efdf2bf392018eaeed384a88ba067
+    domain: device_tracker
+    entity_id: device_tracker.luke_s_iphone
+    type: enters
+    zone: zone.harare
+  - platform: device
+    device_id: 148efdf2bf392018eaeed384a88ba067
+    domain: device_tracker
+    entity_id: device_tracker.luke_s_iphone
+    type: leaves
+    zone: zone.harare
+  condition: []
+  action:
+  - device_id: d6e97fceb1856a99269fd7ffa0502850
+    domain: mobile_app
+    type: notify
+    message: Luka leaving Harare
+    title: Luka in Harare
+  mode: single
+- id: '1665475699724'
+  alias: Flat entrance Motion
+  description: ''
+  trigger:
+  - platform: device
+    type: turned_on
+    device_id: 69b1b29f4168dff2209ddf7bb0334edd
+    entity_id: switch.flat_entrance_motion_detection
+    domain: switch
+  condition: []
+  action:
+  - device_id: d6e97fceb1856a99269fd7ffa0502850
+    domain: mobile_app
+    type: notify
+    message: Motion outside flat
+  mode: single
+- id: '1665509332997'
+  alias: Loadshedding Calendar Start
+  description: ''
+  trigger:
+  - platform: calendar
+    event: start
+    offset: -0:5:0
+    entity_id: calendar.westbrooke_loadshedding
+  condition: []
+  action:
+  - type: turn_off
+    device_id: 95884cc3a94bd29a6b94d707f51f15b8
+    entity_id: light.coldroom_relay
+    domain: light
+  mode: single
+- id: '1665509371884'
+  alias: Loadshedding Calendar End
+  description: ''
+  trigger:
+  - platform: calendar
+    event: end
+    offset: 0:5:0
+    entity_id: calendar.westbrooke_loadshedding
+  condition: []
+  action:
+  - type: turn_on
+    device_id: 95884cc3a94bd29a6b94d707f51f15b8
+    entity_id: light.coldroom_relay
+    domain: light
+  mode: single
+- id: '1665509562379'
+  alias: Sunrise
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunrise
+    offset: '30'
+  condition: []
+  action: []
+  mode: single

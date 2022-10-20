@@ -1,0 +1,10 @@
+alias: Refresh MQTT Victron
+description: 'Request the data on the MQTT server'
+trigger:
+  - platform: time_pattern
+    seconds: '30'
+action:
+  - service: mqtt.publish
+    data:
+      topic: venus-home/R/d4124390e608/system/0/Serial
+mode: single

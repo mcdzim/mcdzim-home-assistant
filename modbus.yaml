@@ -1,0 +1,9 @@
+# https://community.victronenergy.com/questions/78971/home-assistant-modbus-integration-tutorial.html
+
+# modbus:
+  - name: victron
+    type: tcp
+    retry_on_empty: true
+    retries: 10
+    host: 192.168.1.104  # use the IP address of your CCGX
+    port: 502

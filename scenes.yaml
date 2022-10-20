@@ -1,0 +1,34 @@
+- id: '1664814645065'
+  name: Sunset
+  entities: {}
+  icon: mdi:sun-clock
+  metadata: {}
+- id: '1665398696982'
+  name: High Power Devices
+  entities:
+    light.coldroom_relay:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      icon: mdi:fridge-outline
+      friendly_name: Coldroom Relay
+      supported_features: 0
+      state: 'on'
+    light.pool_control:
+      supported_color_modes:
+      - onoff
+      icon: mdi:pool
+      friendly_name: Pool Control
+      supported_features: 0
+      color_mode: onoff
+      state: 'on'
+    light.downstairs_geyser:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      icon: mdi:heating-coil
+      friendly_name: Flatlet Geyser
+      supported_features: 0
+      state: 'on'
+  icon: mdi:power-plug-off-outline
+  metadata: {}
