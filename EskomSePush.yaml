@@ -1,11 +1,23 @@
 #Amber power price 
   - platform: command_line  
     command: 'curl -X POST \ https://api.amberelectric.com.au/prices/listprices \ -H "Content-Type: application/json" \ -d { "postcode": "5555" } '
-    name: power_price
-    unit_of_measurement: '$'
+    name: LoasdheddingStage
+    unit_of_measurement: ''
     json_attributes:
       - data.staticPrices.E1.totalfixedKWHPrice
       - data.staticPrices.E1.lossFactor
       - data.variablePricesAndRenewables.[period].wholesaleKWHPrice
-    scan_interval: 20
+    scan_interval: 600
     command_timeout: 30
+
+
+# # Example configuration.yaml entry
+# sensor:
+#   - platform: rest
+#     resource_template: https://developer.sepush.co.za/personal/2.0/area?id=eskde-10-fourwaysext10cityofjohannesburggauteng&test=current
+#     headers:
+#       Authorization: >
+#         Bearer {{ states("input_text.EskomSePushToken") }}
+#     params:
+#       start_date: >
+#         {{ (now() - timedelta(days = 1)).strftime('%Y-%m-%d') }}

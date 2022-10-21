@@ -14,7 +14,7 @@ scene: !include scenes.yaml
 # sensor: !include sensors.yaml
 modbus: !include modbus.yaml
 # sensor: !include eskom.yaml
-sensor: !include EskomSePush.yaml
+# sensor: !include EskomSePush.yaml
 
 # hikvision: !include hikvision.yaml
 
@@ -32,3 +32,8 @@ sensor:
             {{ tariff.LT }}
           {% endif %}
     
+  # - platform: integration
+  #   source: sensor.battery_discharge_power
+  #   name: Battery Discharge
+  #   unit_prefix: k
+  #   round: 2

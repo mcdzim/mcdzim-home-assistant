@@ -1,8 +1,10 @@
 # BMV-700 : 224
-# Victorn hub : 100
+# Victron hub : 100
 # Solar charger : 226, 238, 237, 236
 # Multiplus : 227
 # Grid meter : 30
+
+# https://community.victronenergy.com/questions/78971/home-assistant-modbus-integration-tutorial.html
 
 
 
@@ -17,6 +19,7 @@
         unit_of_measurement: "V"
         slave: 30
         address: 2616
+        unique_id: grid_l1_voltage
         scale: 0.1
 
       - name: "Grid L1"
@@ -44,20 +47,23 @@
         device_class: power
 
       - name: "Battery Power"
+        scan_interval: 10
         data_type: int16
         unit_of_measurement: "W"
         slave: 100
         address: 842
         scale: 1
-        unique_id: battery_discharged_energy1
+        unique_id: battery_power
         device_class: power
 
       - name: "PV Power"
+        scan_interval: 10
         data_type: uint16
         unit_of_measurement: "W"
         slave: 100
         address: 850
         scale: 1
+        unique_id: pv_power
         device_class: power
 
       - name: "AC Consumption L1"
@@ -65,6 +71,7 @@
         unit_of_measurement: "W"
         slave: 100
         address: 817
+        unique_id: AC_consumption_l1
         device_class: power
         
       - name: "AC Consumption L2"
@@ -72,6 +79,7 @@
         unit_of_measurement: "W"
         slave: 100
         address: 818
+        unique_id: AC_consumption_l2
         device_class: power
         
       - name: "AC Consumption L3"
@@ -79,45 +87,49 @@
         unit_of_measurement: "W"
         slave: 100
         address: 819
-        device_class: power
-        
-      - name: "PV Power"
-        scan_interval: 10
-        unit_of_measurement: "W"
-        slave: 100
-        address: 850
+        unique_id: AC_consumption_l3
         device_class: power
 
       - name: "ESS State"
         scan_interval: 10
         slave: 100
         address: 2900
+        # 0=Unused, BL disabled;1=Restarting;2=Self-consumption;3=Self-consumption;4=Self-consumption;5=Discharge disabled;6=Force charge;7=Sustain;8=Low Soc Recharge;9=Keep batteries charged;10=BL Disabled;11=BL Disabled (Low SoC);12=BL Disabled (Low SOC recharge)
 
-      - name: "Battery SoC"
-        scan_interval: 10
-        slave: 100
-        address: 843
+
+      # - name: "Battery SoC"
+      #   scan_interval: 10
+      #   slave: 100
+      #   address: 843
             
       # SYSTEM
       - name: Inverter State
+        scan_interval: 10
         slave: 227
         address: 33
         data_type: uint16
         scale: 1
 
       - name: "Victron Power Source"
+        scan_interval: 10
         data_type: int16
         slave: 100
         address: 826
         scale: 1
+        # 0=Unknown;1=Grid;2=Generator;3=Shore power;240=Not connected
+
 
       - name: 'ESS Minimum SoC setpoint'
+        scan_interval: 10
         unit_of_measurement: "%"
         slave: 100
         address: 2901
         scale: 0.1
 
+
+  # BMV 700 information
       - name: 'Battery State of Charge'
+        scan_interval: 10
         unit_of_measurement: "%"
         slave: 224
         address: 266
@@ -128,19 +140,56 @@
         scan_interval: 10
         slave: 224
         address: 301
-        unique_id: battery_discharged_energy1
+        unique_id: battery_discharged_energy
         unit_of_measurement: "kWh"
         device_class: energy
-        state_class: total_increasing
 
       - name: "Battery Charged Energy"
         scan_interval: 10
         slave: 224
         address: 302
-        unique_id: battery_charged_energy1
+        unique_id: battery_charged_energy
         unit_of_measurement: "kWh"
         device_class: energy
         state_class: total_increasing
 
+      # Solar Chargers
+      - name: "Solar Charger 1 Yield"
+        scan_interval: 10
+        slave: 226
+        address: 790
+        scale: 10
+        unique_id: solar_charger_1
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
       
+      - name: "Solar Charger 2 Yield"
+        scan_interval: 10
+        slave: 236
+        address: 790
+        scale: 10
+        unique_id: solar_charger_2
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
       
+      - name: "Solar Charger 3 Yield"
+        scan_interval: 10
+        slave: 237
+        address: 790
+        scale: 10
+        unique_id: solar_charger_3
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
+      
+      - name: "Solar Charger 4 Yield"
+        scan_interval: 10
+        slave: 238
+        address: 790
+        scale: 10
+        unique_id: solar_charger_4
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
