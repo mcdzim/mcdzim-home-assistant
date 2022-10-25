@@ -31,9 +31,42 @@ sensor:
           {% else %}
             {{ tariff.LT }}
           {% endif %}
-    
-  # - platform: integration
-  #   source: sensor.battery_discharge_power
-  #   name: Battery Discharge
-  #   unit_prefix: k
-  #   round: 2
+
+
+template:
+  #Split power in and out of battery
+  - sensor:
+      - name: "Battery power victron charge"
+        unit_of_measurement: "W"
+        unique_id: victron_battery_charged_power
+        device_class: power
+        state: >
+          {% if states('sensor.battery_power')|float >= 0 %}
+            {{ states('sensor.battery_power') }}
+          {% else %}
+            0
+          {% endif %}
+      - name: "Battery power victron discharge"
+        unit_of_measurement: "W"
+        unique_id: victron_battery_discharged_power
+        device_class: power
+        state: >
+          {% if states('sensor.battery_power')|float < 0 %}
+            {{ -1 * states('sensor.battery_power')|float }}
+          {% else %}
+            0
+          {% endif %}
+
+# - platform: integration
+#     source: sensor.victron_battery_charged_power
+#     unique_id: victron_battery_charged_energy
+#     name: 'Victron battery in energy'
+#     unit_prefix: k
+#     round: 2
+
+# - platform: integration
+#   source: sensor.victron_battery_discharged_power
+#   unique_id: victron_battery_discharged_energy
+#   name: 'Victron battery out energy'
+#   unit_prefix: k
+#   round: 2      

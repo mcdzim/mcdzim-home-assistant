@@ -3,7 +3,7 @@
   description: ''
   trigger:
   - platform: numeric_state
-    entity_id: sensor.battery_soc
+    entity_id: sensor.battery_state_of_charge
     for:
       hours: 0
       minutes: 5
@@ -75,12 +75,12 @@
   description: ''
   trigger:
   - platform: numeric_state
-    entity_id: sensor.battery_soc
+    entity_id: sensor.battery_state_of_charge
     for:
       hours: 0
       minutes: 5
       seconds: 0
-    below: 50
+    below: 24
   condition: []
   action:
   - service: notify.mobile_app_pixel_4a
@@ -195,4 +195,21 @@
     offset: '30'
   condition: []
   action: []
+  mode: single
+- id: '1666596192382'
+  alias: Grid low voltage
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.grid_l1_voltage
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 10
+    below: 200
+  condition: []
+  action:
+  - service: notify.mobile_app_pixel_4a
+    data:
+      message: Low voltage
   mode: single
