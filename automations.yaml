@@ -155,6 +155,19 @@
     domain: mobile_app
     type: notify
     message: Motion outside flat
+  - type: turn_on
+    device_id: 0a5f939be7b3ea17937a7c6c469d984a
+    entity_id: light.flatlet_light
+    domain: light
+  - delay:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+  - type: turn_off
+    device_id: 0a5f939be7b3ea17937a7c6c469d984a
+    entity_id: light.flatlet_light
+    domain: light
   mode: single
 - id: '1665509332997'
   alias: Loadshedding Calendar Start
@@ -213,3 +226,20 @@
     data:
       message: Low voltage
   mode: single
+
+# # from automations.yaml
+# - id: '1614077768708'
+#   alias: Victron Modbus Write min SOC manual
+#   description: ''
+#   trigger:
+#   - platform: state
+#     entity_id: input_number.minimum_battery_soc
+#   condition: []
+#   action:
+#   - service: modbus.write_register
+#     data:
+#       hub: victron
+#       unit: 100
+#       address: 2901
+#       value: '{{ states.sensor.multiplus_minimal_soc_set_setpoint.state|int }}'
+#   mode: sing

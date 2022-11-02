@@ -10,9 +10,12 @@
 
 # modbus:
   - name: victron
+    retry_on_empty: true
+    retries: 10
     type: tcp
-    host: 192.168.1.104  # use the IP address of your CCGX
+    host: 192.168.1.104
     port: 502
+
     sensors:
       - name: "Grid L1 Voltage"
         scan_interval: 10
@@ -94,13 +97,8 @@
         scan_interval: 10
         slave: 100
         address: 2900
+        unique_id: ess_state
         # 0=Unused, BL disabled;1=Restarting;2=Self-consumption;3=Self-consumption;4=Self-consumption;5=Discharge disabled;6=Force charge;7=Sustain;8=Low Soc Recharge;9=Keep batteries charged;10=BL Disabled;11=BL Disabled (Low SoC);12=BL Disabled (Low SOC recharge)
-
-
-      # - name: "Battery SoC"
-      #   scan_interval: 10
-      #   slave: 100
-      #   address: 843
             
       # SYSTEM
       - name: Inverter State
@@ -109,6 +107,8 @@
         address: 33
         data_type: uint16
         scale: 1
+        unique_id: victron_inverter_state
+
 
       - name: "Victron Power Source"
         scan_interval: 10
@@ -116,6 +116,7 @@
         slave: 100
         address: 826
         scale: 1
+        unique_id: victron_power_source
         # 0=Unknown;1=Grid;2=Generator;3=Shore power;240=Not connected
 
 
@@ -125,6 +126,7 @@
         slave: 100
         address: 2901
         scale: 0.1
+        unique_id: ess_minumum_soc
 
 
   # BMV 700 information
@@ -135,6 +137,8 @@
         address: 266
         scale: 0.1
         precision: 0
+        unique_id: battery_state_of_charge
+
 
       # - name: "Battery Discharged Energy"
       #   scan_interval: 10
@@ -167,32 +171,58 @@
         device_class: energy
         state_class: total_increasing
       
-      # - name: "Solar Charger 2 Yield"
-      #   scan_interval: 10
-      #   slave: 236
-      #   address: 790
-      #   scale: 1
-      #   unique_id: solar_charger_2
-      #   unit_of_measurement: "kWh"
-      #   device_class: energy
-      #   state_class: total_increasing
+      - name: "Solar Charger 2 Yield"
+        scan_interval: 10
+        slave: 236
+        address: 790
+        scale: 1
+        unique_id: solar_charger_2
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
       
-      # - name: "Solar Charger 3 Yield"
-      #   scan_interval: 10
-      #   slave: 237
-      #   address: 790
-      #   scale: 1
-      #   unique_id: solar_charger_3
-      #   unit_of_measurement: "kWh"
-      #   device_class: energy
-      #   state_class: total_increasing
+      - name: "Solar Charger 3 Yield"
+        scan_interval: 10
+        slave: 237
+        address: 790
+        scale: 1
+        unique_id: solar_charger_3
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
       
-      # - name: "Solar Charger 4 Yield"
-      #   scan_interval: 10
-      #   slave: 238
-      #   address: 790
-      #   scale: 1
-      #   unique_id: solar_charger_4
-      #   unit_of_measurement: "kWh"
-      #   device_class: energy
-      #   state_class: total_increasing
+      - name: "Solar Charger 4 Yield"
+        scan_interval: 10
+        slave: 238
+        address: 790
+        scale: 1
+        unique_id: solar_charger_4
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: total_increasing
+
+#Alarm Sensors
+      - name: 'Grid lost alarm'
+        slave: 227
+        address: 64
+        data_type: uint16
+        unit_of_measurement: "0=Ok;1=Warning"
+        
+      - name: 'Multi Temperature alarm'
+        slave: 227
+        address: 34
+        data_type: uint16
+        unit_of_measurement: "0=Ok;1=Warning;2=Alarm"
+        
+      - name: 'Multi Overload alarm'
+        slave: 227
+        address: 36
+        data_type: uint16
+        unit_of_measurement: "0=Ok;1=Warning;2=Alarm"
+
+      - name: 'CCGX Relay Boiler'
+        slave: 224
+        address: 806
+        data_type: uint16
+        unit_of_measurement: "1=Off;0=Heat"
+
