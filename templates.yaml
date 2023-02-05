@@ -1,8 +1,49 @@
 sensor:
-    - name: 'Next Loadshedding'
-      device_class: timestamp
-      state: >
-        {{ strptime(states.sensor.esp_loadshedding.attributes.events[0].start, '%Y-%m-%dT%H:%M:%S%z') }}
-    - name: 'Minutes to next loadshedding'
-      state: >
-        {{ ((strptime(states.sensor.esp_loadshedding.attributes.events[0].start, '%Y-%m-%dT%H:%M:%S%z') - now() ).seconds/60) | int }}
+  - name: "Battery Power Charging"
+    unit_of_measurement: "W"
+    unique_id: battery_charging_power
+    device_class: power
+    state: >
+      {% if states('sensor.battery_power')|float >= 0 %}
+        {{ states('sensor.battery_power') }}
+      {% else %}
+        0
+      {% endif %}
+  - name: "Battery Power Discharging"
+    unit_of_measurement: "W"
+    unique_id: battery_discharging_power
+    device_class: power
+    state: >
+      {% if states('sensor.battery_power')|float < 0 %}
+        {{ -1 * states('sensor.battery_power')|float }}
+      {% else %}
+        0
+      {% endif %}
+  - name: "EV Charger State Text"
+    unique_id: ev_status_text
+    state: >
+      {% set state = states('sensor.victron_ev_status') %}
+      {% if state == 0 %}Disconnected
+      {% elif state == 1 %}Connected
+      {% elif state == 2 %}Charging
+      {% elif state == 3 %}Charged
+      {% elif state == 4 %}Waiting for sun
+      {% elif state == 5 %}Waiting for RFID
+      {% elif state == 6 %}Waiting for start
+      {% elif state == 7 %}Low SOC
+      {% elif state == 8 %}Ground fault
+      {% elif state == 9 %}Welded contacts
+      {% elif state == 10 %}CP Input shorted
+      {% elif state == 11 %}Residual current detected
+      {% elif state == 12 %}Under voltage detected
+      {% elif state == 13 %}Overvoltage detected
+      {% elif state == 14 %}Overheating detected
+      {% else %}Unknown
+      {% endif %}
+  - name: 'Next Loadshedding'
+    device_class: timestamp
+    state: >
+      {{ strptime(states.sensor.esp_loadshedding.attributes.events[0].start, '%Y-%m-%dT%H:%M:%S%z') }}
+  - name: 'Minutes to next loadshedding'
+    state: >
+      {{ ((strptime(states.sensor.esp_loadshedding.attributes.events[0].start, '%Y-%m-%dT%H:%M:%S%z') - now() ).seconds/60) | int }}

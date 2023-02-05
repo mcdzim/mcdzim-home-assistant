@@ -1,228 +1,294 @@
-# BMV-700 : 224
-# Victron hub : 100
-# Solar charger : 226, 238, 237, 236
-# Multiplus : 227
-# Grid meter : 30
-
-# https://community.victronenergy.com/questions/78971/home-assistant-modbus-integration-tutorial.html
-
-
-
-# modbus:
-  - name: victron
-    retry_on_empty: true
-    retries: 10
-    type: tcp
-    host: 192.168.1.104
-    port: 502
-
-    sensors:
-      - name: "Grid L1 Voltage"
-        scan_interval: 10
-        unit_of_measurement: "V"
-        slave: 30
-        address: 2616
-        unique_id: grid_l1_voltage
-        scale: 0.1
-
-      - name: "Grid L1"
-        scan_interval: 10
-        unit_of_measurement: "W"
-        slave: 100
-        address: 820
-        unique_id: grid_l1
-        device_class: power
- 
-      - name: "Grid L2"
-        scan_interval: 10
-        unit_of_measurement: "W"
-        slave: 100
-        address: 821
-        unique_id: grid_l2
-        device_class: power
- 
-      - name: "Grid L3"
-        scan_interval: 10
-        unit_of_measurement: "W"
-        slave: 100
-        address: 822
-        unique_id: grid_l3
-        device_class: power
-
-      - name: "Battery Power"
-        scan_interval: 10
-        data_type: int16
-        unit_of_measurement: "W"
-        slave: 100
-        address: 842
-        scale: 1
-        unique_id: battery_power
-        device_class: power
-
-      - name: "PV Power"
-        scan_interval: 10
-        data_type: uint16
-        unit_of_measurement: "W"
-        slave: 100
-        address: 850
-        scale: 1
-        unique_id: pv_power
-        device_class: power
-
-      - name: "AC Consumption L1"
-        scan_interval: 10
-        unit_of_measurement: "W"
-        slave: 100
-        address: 817
-        unique_id: AC_consumption_l1
-        device_class: power
-        
-      - name: "AC Consumption L2"
-        scan_interval: 10
-        unit_of_measurement: "W"
-        slave: 100
-        address: 818
-        unique_id: AC_consumption_l2
-        device_class: power
-        
-      - name: "AC Consumption L3"
-        scan_interval: 10
-        unit_of_measurement: "W"
-        slave: 100
-        address: 819
-        unique_id: AC_consumption_l3
-        device_class: power
-
-      - name: "ESS State"
-        scan_interval: 10
-        slave: 100
-        address: 2900
-        unique_id: ess_state
-        # 0=Unused, BL disabled;1=Restarting;2=Self-consumption;3=Self-consumption;4=Self-consumption;5=Discharge disabled;6=Force charge;7=Sustain;8=Low Soc Recharge;9=Keep batteries charged;10=BL Disabled;11=BL Disabled (Low SoC);12=BL Disabled (Low SOC recharge)
+    # BMV-700 : 224
+    # Victron hub : 100
+    # Solar charger : 226, 238, 237, 236
+    # Multiplus : 227
+    # Grid meter : 30
+    # EV Charger : 40
+    
+    # https://community.victronenergy.com/questions/78971/home-assistant-modbus-integration-tutorial.html
+    # so much help from chatgpt
+    
+    
+    # modbus:
+      - name: victron
+        retry_on_empty: true
+        retries: 10
+        type: tcp
+        host: !secret venus_ip
+        port: 502
+    
+        # switch:
+        #   - name: Victron EV Charger Relay
+        #     slave: !secret com.victronenergy.evcharger
+        #     register:
+        #       - name: Relay
+        #         type: coil
+        #         address: 40100
+        #   - name: victron_inverter_ess_min_soc_setpoint
+        #     value_template: "{{ states('sensor.ess_minumum_soc') }}"
+        #     turn_on:
+        #       service: modbus.write_register
+        #       data:
+        #         unit_id: !secret com.victronenergy.system
+        #         register: 40068
+        #         value: "{{ states('input_number.ess_minumum_soc') }}"
+        #     turn_off:
+        #       service: modbus.write_register
+        #       data:
+        #         unit_id: !secret com.victronenergy.system
+        #         register: 40068
+        #         value: "{{ states('input_number.ess_minumum_soc') }}"
+    
+        sensors:
+        #   - name:  "ESS Minimum SOC Setpoint"
+        #     slave: !secret com.victronenergy.system
+        #     register: 40068
+        #     register_type: holding
+        #     type: int
+        #     unit_of_measurement: '%'
+        #     value_template: '{{ value / 100.0 }}'
+    
+          - name: "Grid L1 Voltage"
+            scan_interval: 10
+            unit_of_measurement: "V"
+            slave: !secret com.victronenergy.grid
+            address: 2616
+            unique_id: grid_l1_voltage
+            scale: 0.1
+    
+          - name: "Grid L1"
+            scan_interval: 10
+            unit_of_measurement: "W"
+            slave: !secret com.victronenergy.system
+            address: 820
+            unique_id: grid_l1
+            device_class: power
+     
+          - name: "Grid L2"
+            scan_interval: 10
+            unit_of_measurement: "W"
+            slave: !secret com.victronenergy.system
+            address: 821
+            unique_id: grid_l2
+            device_class: power
+     
+          - name: "Grid L3"
+            scan_interval: 10
+            unit_of_measurement: "W"
+            slave: !secret com.victronenergy.system
+            address: 822
+            unique_id: grid_l3
+            device_class: power
+    
+          - name: "Battery Power"
+            scan_interval: 10
+            data_type: int16
+            unit_of_measurement: "W"
+            slave: !secret com.victronenergy.system
+            address: 842
+            scale: 1
+            unique_id: battery_power
+            device_class: power
+    
+          - name: "PV Power"
+            scan_interval: 10
+            data_type: uint16
+            unit_of_measurement: "W"
+            slave: !secret com.victronenergy.system
+            address: 850
+            scale: 1
+            unique_id: pv_power
+            device_class: power
+    
+          - name: "AC Consumption L1"
+            scan_interval: 10
+            unit_of_measurement: "W"
+            slave: !secret com.victronenergy.system
+            address: 817
+            unique_id: AC_consumption_l1
+            device_class: power
             
-      # SYSTEM
-      - name: Inverter State
-        scan_interval: 10
-        slave: 227
-        address: 33
-        data_type: uint16
-        scale: 1
-        unique_id: victron_inverter_state
-
-
-      - name: "Victron Power Source"
-        scan_interval: 10
-        data_type: int16
-        slave: 100
-        address: 826
-        scale: 1
-        unique_id: victron_power_source
-        # 0=Unknown;1=Grid;2=Generator;3=Shore power;240=Not connected
-
-
-      - name: 'ESS Minimum SoC setpoint'
-        scan_interval: 10
-        unit_of_measurement: "%"
-        slave: 100
-        address: 2901
-        scale: 0.1
-        unique_id: ess_minumum_soc
-
-
-  # BMV 700 information
-      - name: 'Battery State of Charge'
-        scan_interval: 10
-        unit_of_measurement: "%"
-        slave: 224
-        address: 266
-        scale: 0.1
-        precision: 0
-        unique_id: battery_state_of_charge
-
-
-      # - name: "Battery Discharged Energy"
-      #   scan_interval: 10
-      #   slave: 224
-      #   address: 301
-      #   unique_id: battery_discharged_energy
-      #   unit_of_measurement: "kWh"
-      #   scale: 0.1
-      #   device_class: energy
-      #   # state_class: total_decreasing
-
-      # - name: "Battery Charged Energy"
-      #   scan_interval: 10
-      #   slave: 224
-      #   address: 302
-      #   unique_id: battery_charged_energy
-      #   unit_of_measurement: "kWh"
-      #   scale: 0.1
-      #   device_class: energy
-      #   state_class: total_increasing
-
-      # Solar Chargers
-      - name: "Solar Charger 1 Yield"
-        scan_interval: 10
-        slave: 226
-        address: 790
-        scale: 1
-        unique_id: solar_charger_1b
-        unit_of_measurement: "kWh"
-        device_class: energy
-        state_class: total_increasing
-      
-      - name: "Solar Charger 2 Yield"
-        scan_interval: 10
-        slave: 236
-        address: 790
-        scale: 1
-        unique_id: solar_charger_2
-        unit_of_measurement: "kWh"
-        device_class: energy
-        state_class: total_increasing
-      
-      - name: "Solar Charger 3 Yield"
-        scan_interval: 10
-        slave: 237
-        address: 790
-        scale: 1
-        unique_id: solar_charger_3
-        unit_of_measurement: "kWh"
-        device_class: energy
-        state_class: total_increasing
-      
-      - name: "Solar Charger 4 Yield"
-        scan_interval: 10
-        slave: 238
-        address: 790
-        scale: 1
-        unique_id: solar_charger_4
-        unit_of_measurement: "kWh"
-        device_class: energy
-        state_class: total_increasing
-
-#Alarm Sensors
-      - name: 'Grid lost alarm'
-        slave: 227
-        address: 64
-        data_type: uint16
-        unit_of_measurement: "0=Ok;1=Warning"
-        
-      - name: 'Multi Temperature alarm'
-        slave: 227
-        address: 34
-        data_type: uint16
-        unit_of_measurement: "0=Ok;1=Warning;2=Alarm"
-        
-      - name: 'Multi Overload alarm'
-        slave: 227
-        address: 36
-        data_type: uint16
-        unit_of_measurement: "0=Ok;1=Warning;2=Alarm"
-
-      - name: 'CCGX Relay Boiler'
-        slave: 224
-        address: 806
-        data_type: uint16
-        unit_of_measurement: "1=Off;0=Heat"
-
+          - name: "AC Consumption L2"
+            scan_interval: 10
+            unit_of_measurement: "W"
+            slave: !secret com.victronenergy.system
+            address: 818
+            unique_id: AC_consumption_l2
+            device_class: power
+            
+          - name: "AC Consumption L3"
+            scan_interval: 10
+            unit_of_measurement: "W"
+            slave: !secret com.victronenergy.system
+            address: 819
+            unique_id: AC_consumption_l3
+            device_class: power
+    
+          - name: "ESS State"
+            scan_interval: 10
+            slave: !secret com.victronenergy.system
+            address: 2900
+            unique_id: ess_state
+            # 0=Unused, BL disabled;1=Restarting;2=Self-consumption;3=Self-consumption;4=Self-consumption;5=Discharge disabled;6=Force charge;7=Sustain;8=Low Soc Recharge;9=Keep batteries charged;10=BL Disabled;11=BL Disabled (Low SoC);12=BL Disabled (Low SOC recharge)
+                
+    # SYSTEM
+          - name: "Inverter State"
+            scan_interval: 10
+            slave: 227
+            address: 33
+            data_type: uint16
+            scale: 1
+            unique_id: victron_inverter_state
+    
+    
+          - name: "Victron Power Source"
+            scan_interval: 10
+            data_type: int16
+            slave: !secret com.victronenergy.system
+            address: 826
+            scale: 1
+            unique_id: victron_power_source
+            # 0=Unknown;1=Grid;2=Generator;3=Shore power;240=Not connected
+    
+    
+          - name: 'ESS Minimum SoC setpoint'
+            scan_interval: 10
+            unit_of_measurement: "%"
+            slave: !secret com.victronenergy.system
+            address: 2901
+            scale: 0.1
+            unique_id: ess_minumum_soc
+    
+    
+    # BMV 700 information
+          - name: 'Battery State of Charge'
+            scan_interval: 10
+            unit_of_measurement: "%"
+            slave: 224
+            address: 266
+            scale: 0.1
+            precision: 0
+            unique_id: battery_state_of_charge
+    
+    # Solar Chargers
+          - name: "Solar Charger 1 Yield"
+            scan_interval: 10
+            slave: !secret com.victronenergy.solarcharger1
+            address: 790
+            scale: 1
+            unique_id: solar_charger_1b
+            unit_of_measurement: "kWh"
+            device_class: energy
+            state_class: total_increasing
+          
+          - name: "Solar Charger 2 Yield"
+            scan_interval: 10
+            slave: !secret com.victronenergy.solarcharger2
+            address: 790
+            scale: 1
+            unique_id: solar_charger_2
+            unit_of_measurement: "kWh"
+            device_class: energy
+            state_class: total_increasing
+          
+          - name: "Solar Charger 3 Yield"
+            scan_interval: 10
+            slave: !secret com.victronenergy.solarcharger3
+            address: 790
+            scale: 1
+            unique_id: solar_charger_3
+            unit_of_measurement: "kWh"
+            device_class: energy
+            state_class: total_increasing
+          
+          - name: "Solar Charger 4 Yield"
+            scan_interval: 10
+            slave: !secret com.victronenergy.solarcharger4
+            address: 790
+            scale: 1
+            unique_id: solar_charger_4
+            unit_of_measurement: "kWh"
+            device_class: energy
+            state_class: total_increasing
+    
+    #Alarm Sensors
+          - name: 'Grid lost alarm'
+            slave: !secret com.victronenergy.vebus
+            address: 64
+            data_type: uint16
+            unit_of_measurement: "0=Ok;1=Warning"
+            
+          - name: 'Multi Temperature alarm'
+            slave: !secret com.victronenergy.vebus
+            address: 34
+            data_type: uint16
+            unit_of_measurement: "0=Ok;1=Warning;2=Alarm"
+            
+          - name: 'Multi Overload alarm'
+            slave: !secret com.victronenergy.vebus
+            address: 36
+            data_type: uint16
+            unit_of_measurement: "0=Ok;1=Warning;2=Alarm"
+    
+    #EV Charger 
+          - name: 'EV Charger Status'
+            scan_interval: 10
+            slave: !secret com.victronenergy.evcharger
+            address: 3824
+            data_type: uint16
+            unique_id: victron_ev_status
+            unit_of_measurement: "0=Disconnected; 1=Connected; 2=Charging; 3=Charged; 4=Waiting for sun; 5=Waiting for RFID; 6=Waiting for start; 7=Low SOC; 8=Ground fault; 9=Welded contacts; 10=CP Input shorted; 11=Residual current detected; 12=Under voltage detected; 13=Overvoltage detected; 14=Overheating detected"
+    
+          - name: "EV Charger Current"
+            scan_interval: 10
+            slave: !secret com.victronenergy.evcharger
+            address: 3823
+            scale: 1
+            unique_id: victron_ev_current
+            unit_of_measurement: "A"
+            
+          - name: "EV Charger Energy"
+            scan_interval: 10
+            slave: !secret com.victronenergy.evcharger
+            address: 3816
+            scale: 100
+            unique_id: victron_ev_energy
+            data_type: uint16
+            unit_of_measurement: "kWh"
+            device_class: energy
+            
+          - name: "EV Power"
+            scan_interval: 10
+            unit_of_measurement: "W"
+            slave: !secret com.victronenergy.evcharger
+            address: 3821
+            unique_id: victron_ev_power
+            device_class: power
+            
+        #   - name: Victron EV Charger
+        #     slave: !secret com.victronenergy.evcharger 
+        #     register:
+        #       - name: Charging Current
+        #         address: 3823
+        #         unit_of_measurement: 'A'
+        #         scan_interval: 10
+        #         scale: 1
+        #         unique_id: victron_ev_current
+        #       - name: Charging Voltage
+        #         type: hreg
+        #         address: 40106
+        #         unit_of_measurement: 'V'
+        #       - name: Charging Power
+        #         type: hreg
+        #         address: 40107
+        #         unit_of_measurement: 'W'
+        #       - name: Battery Voltage
+        #         type: hreg
+        #         address: 40110
+        #         unit_of_measurement: 'V'
+        #       - name: Charging State
+        #         type: hreg
+        #         address: 40118
+        #         unit_of_measurement: ''
+                
+            

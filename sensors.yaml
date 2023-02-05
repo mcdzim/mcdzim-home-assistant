@@ -1,45 +1,55 @@
-
-template:
-  #Split power in and out of battery
-  - sensor:
-      - name: "Battery Power Charging"
-        unit_of_measurement: "W"
-        unique_id: battery_charging_power
-        device_class: power
-        state: >
-          {% if states('sensor.battery_power')|float >= 0 %}
-            {{ states('sensor.battery_power') }}
-          {% else %}
-            0
-          {% endif %}
-      - name: "Battery Power Discharging"
-        unit_of_measurement: "W"
-        unique_id: battery_discharging_power
-        device_class: power
-        state: >
-          {% if states('sensor.battery_power')|float < 0 %}
-            {{ -1 * states('sensor.battery_power')|float }}
-          {% else %}
-            0
-          {% endif %}
-
-# Integrate each power sensor into energy separately
+          
+# Example Pi info configuration.yaml entry with all entry types (delete/comment out as necessary)
 sensor:
-  - platform: integration
-    source: sensor.battery_charging_power
-    unique_id: battery_charged_energy2
-    name: 'Battery Energy Charged'
-    unit_prefix: k
-    # unit_of_measurement: kW
-    # device_class: energy
-    round: 2
+  - platform: systemmonitor
+    resources:
+      - type: disk_use_percent
+        arg: /config
+      - type: disk_use
+      - type: disk_free
+      - type: memory_use_percent
+      - type: memory_use
+      - type: memory_free
+      - type: load_1m
+      - type: load_5m
+      - type: load_15m
+      - type: ipv4_address
+        arg: eth0
+      - type: ipv6_address
+        arg: eth0
+      - type: processor_use
+      - type: processor_temperature
+      - type: last_boot
+      
+      
+#   - platform: mqtt
+#     name: "Arduino MQTT Time On"
+#     state_topic: "/homeassistant/test_arduino/time_onn"
 
-sensor:
-  - platform: integration
-    source: sensor.battery_discharging_power
-    unique_id: battery_discharged_energy2
-    name: 'Battery Energy Discharged'
-    unit_prefix: k
-    # unit_of_measurement: kW
-    # device_class: energy
-    round: 2      
+
+# sensor:
+#   - platform: rest
+#     name: esp_loadshedding
+#     resource: https://developer.sepush.co.za/business/2.0/area?id=eskde-10-fourwaysext10cityofjohannesburggauteng
+#     headers:
+#       token: !secret EskomSePushToken
+#       json_attributes:
+#         - events
+#       scan_interval: 3600
+#       value_template: '{{ value_json.info.name }}'
+
+  - platform: template
+    sensors:
+      ac_power_total:
+        friendly_name: "AC Consumption"
+        value_template: "{{ states('sensor.ac_consumption_l1') | float + states('sensor.ac_consumption_l2') | float +  states('sensor.ac_consumption_l3') | float }}"
+        unit_of_measurement: 'watts'
+        unique_id: ac_consumption_total
+        
+  - platform: template
+    sensors:
+      grid_power_total:
+        friendly_name: "Grid Power"
+        value_template: "{{ states('sensor.grid_l1') | float + states('sensor.grid_l2') | float +  states('sensor.grid_l3') | float }}"
+        unit_of_measurement: 'watts'
+        unique_id: grid_power_total

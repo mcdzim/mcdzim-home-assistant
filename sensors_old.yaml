@@ -1,0 +1,45 @@
+
+template:
+  #Split power in and out of battery
+  - sensor:
+      - name: "Battery Power Charging"
+        unit_of_measurement: "W"
+        unique_id: battery_charging_power
+        device_class: power
+        state: >
+          {% if states('sensor.battery_power')|float >= 0 %}
+            {{ states('sensor.battery_power') }}
+          {% else %}
+            0
+          {% endif %}
+      - name: "Battery Power Discharging"
+        unit_of_measurement: "W"
+        unique_id: battery_discharging_power
+        device_class: power
+        state: >
+          {% if states('sensor.battery_power')|float < 0 %}
+            {{ -1 * states('sensor.battery_power')|float }}
+          {% else %}
+            0
+          {% endif %}
+
+# Integrate each power sensor into energy separately
+sensor:
+  - platform: integration
+    source: sensor.battery_charging_power
+    unique_id: battery_charged_energy2
+    name: 'Battery Energy Charged'
+    unit_prefix: k
+    # unit_of_measurement: kW
+    # device_class: energy
+    round: 2
+
+sensor:
+  - platform: integration
+    source: sensor.battery_discharging_power
+    unique_id: battery_discharged_energy2
+    name: 'Battery Energy Discharged'
+    unit_prefix: k
+    # unit_of_measurement: kW
+    # device_class: energy
+    round: 2      

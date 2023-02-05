@@ -5,112 +5,167 @@ default_config:
 # Text to speech
 tts:
   - platform: google_translate
-
-
-
+  
+# group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 template: !include templates.yaml
-
-
-
 modbus: !include modbus.yaml
 
-# sensor: !include sensors.yaml
-# sensor: !include eskom.yaml
-# sensor: !include EskomSePush.yaml
-
-# hikvision: !include hikvision.yaml
-sensor:
-- platform: rest
-  name: esp_loadshedding
-  resource: https://developer.sepush.co.za/business/2.0/area?id=eskde-10-fourwaysext10cityofjohannesburggauteng
-  headers:
-    token: EskomSePushToken
-  json_attributes:
-    - events
-  scan_interval: 3600
-  value_template: '{{ value_json.info.name }}'
-
-template:
-  #Split power in and out of battery
-  - sensor:
-      - name: "Battery Power Charging"
-        unit_of_measurement: "W"
-        unique_id: battery_charging_power
-        device_class: power
-        state: >
-          {% if states('sensor.battery_power')|float >= 0 %}
-            {{ states('sensor.battery_power') }}
-          {% else %}
-            0
-          {% endif %}
-      - name: "Battery Power Discharging"
-        unit_of_measurement: "W"
-        unique_id: battery_discharging_power
-        device_class: power
-        state: >
-          {% if states('sensor.battery_power')|float < 0 %}
-            {{ -1 * states('sensor.battery_power')|float }}
-          {% else %}
-            0
-          {% endif %}
-
-# Integrate each power sensor into energy separately
-sensor:
-  - platform: integration
-    source: sensor.battery_charging_power
-    unique_id: battery_charged_energy2
-    name: 'Battery Energy Charged'
-    unit_prefix: k
-    # unit_of_measurement: kW
-    # device_class: energy
-    round: 2
-
-sensor:
-  - platform: integration
-    source: sensor.battery_discharging_power
-    unique_id: battery_discharged_energy2
-    name: 'Battery Energy Discharged'
-    unit_prefix: k
-    # unit_of_measurement: kW
-    # device_class: energy
-    round: 2      
-
-sensor:
-  - platform: rest
-    name: esp_loadshedding
-    resource: https://developer.sepush.co.za/business/2.0/area?id=eskde-10-fourwaysext10cityofjohannesburggauteng
-    headers:
-      token: EskomSePushToken
-    json_attributes:
-      - events
-    scan_interval: 3600
-    value_template: '{{ value_json.info.name }}'
-
-sensor:
-  - platform: template
-    sensors:
-      your_tarif:
-        friendly_name: Eskom Tarrif
-        unit_of_measurement: R/kWh
-        value_template: >
-          {% set tariff = { "HT": 2.65, "LT": 2.65 } %}
-          {% if (now().weekday() < 5 and (7 <= now().hour <= 20)) or (now().weekday() == 5 and (7 <= now().hour <= 13)) %}
-            {{ tariff.HT }}
-          {% else %}
-            {{ tariff.LT }}
-          {% endif %}
+# # sensor: !include sensors.yaml
+# # sensor: !include eskom.yaml
+# # sensor: !include EskomSePush.yaml
+# # hikvision: !include hikvision.yaml
 
 device_tracker:
-  - platform: bluetooth_tracker
-    interval_seconds: 300
-    consider_home: 360
+  - platform: traccar
+    host: !secret traccar_host
+    port: 8443
+    username: !secret traccar_user
+    password: !secret traccar_password
+    ssl: true
 
 binary_sensor:
   - platform: hikvision
     host: 192.168.1.150
     username: admin
     password: Slowpolo1
+    customize:
+      motion:
+        delay: 5
+        ignored: false
+      line_crossing:
+        ignored: false
+  - platform: hikvision
+    host: 192.168.1.[151:157]
+    username: admin
+    password: Slowpolo1
+    customize:
+      motion:
+        delay: 5
+        ignored: false
+      line_crossing:
+        ignored: false
+      attended_baggage:
+        ignored: true
+      disk_error:
+        ignored: true
+      disk_full:
+        ignored: true
+      face_detection:
+        ignored: true
+      field_detection:
+        ignored: true
+      illegal_access:
+        ignored: true
+      scene_change_detection:
+        ignored: true
+      tamper_detection:
+        ignored: true
+      unattended_baggage:
+        ignored: true
 
+          
+# Example Pi info configuration.yaml entry with all entry types (delete/comment out as necessary)
+sensor:
+  - platform: systemmonitor
+    resources:
+      - type: disk_use_percent
+        arg: /config
+      - type: disk_use
+      - type: disk_free
+      - type: memory_use_percent
+      - type: memory_use
+      - type: memory_free
+      - type: load_1m
+      - type: load_5m
+      - type: load_15m
+      - type: ipv4_address
+        arg: eth0
+      - type: ipv6_address
+        arg: eth0
+      - type: processor_use
+      - type: processor_temperature
+      - type: last_boot
+
+  - platform: template
+    sensors:
+      ac_power_total:
+        friendly_name: "AC Consumption"
+        value_template: "{{ states('sensor.ac_consumption_l1') | float + states('sensor.ac_consumption_l2') | float +  states('sensor.ac_consumption_l3') | float }}"
+        unit_of_measurement: 'W'
+        unique_id: ac_consumption_total
+        device_class: power
+        
+  - platform: template
+    sensors:
+      grid_power_total:
+        friendly_name: "Grid Power"
+        value_template: "{{ states('sensor.grid_l1') | float + states('sensor.grid_l2') | float +  states('sensor.grid_l3') | float }}"
+        unit_of_measurement: 'W'
+        unique_id: grid_power_total
+        device_class: power
+        
+  - platform: rest
+    resource: "https://loadshedding.eskom.co.za/LoadShedding/GetStatus"
+    name: "Eskom Loadshedding Status"
+    unique_id: loadshedding_chatgpt
+    value_template: >
+      {% set state = value_json.eskde-10-fourwaysext10cityofjohannesburggauteng.LoadSheddingStatus %}
+      {% if state == 0 %}
+        Not currently load shedding
+      {% elif state == 1 %}
+        Load shedding stage {{ value_json.eskde-10-fourwaysext10cityofjohannesburggauteng.Stage }}
+      {% else %}
+        Unknown
+      {% endif %}
+    json_attributes:
+      - Suburb
+      - LoadSheddingStatus
+      - Stage
+    headers:
+      Accept: "application/json"
+    scan_interval: 600
+    verify_ssl: false
+    
+#   - platform: template
+#     sensors:
+#       your_tariff:
+#       friendly_name: Eskom Tariff
+#       unit_of_measurement: R
+#       value_template: >
+#         {% set tariff = { "HT": 2.65, "LT": 2.65 } %}
+#         {% if (now().weekday() < 5 and (7 <= now().hour <= 20)) or (now().weekday() == 5 and (7 <= now().hour <= 13)) %}
+#           {{ tariff.HT }}
+#         {% else %}
+#           {{ tariff.LT }}
+#         {% endif %}
+        
+  - platform: mqtt
+    name: "Evie State of Charge"
+    state_topic: "Thula/inverter1"
+    unit_of_measurement: "%"
+    device_class: battery
+    
+# #   - platform: rest
+# #     name: esp_loadshedding
+# #     resource: https://developer.sepush.co.za/business/2.0/area?id=eskde-10-fourwaysext10cityofjohannesburggauteng
+# #     headers:
+# #       token: !secret EskomSePushToken
+# #       json_attributes:
+# #         - events
+# #       scan_interval: 3600
+# #       value_template: '{{ value_json.info.name }}'
+
+
+
+
+# https://community.home-assistant.io/t/add-service-integration-reload/231940/84
+rest_command:
+  reload_control4:
+    url: http://192.168.1.149:8123/api/config/config_entries/entry/701c707fcffa2adbb9c03b27ba483d75/reload 
+    method: POST
+    headers:
+      authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI1ODU4N2MwZTlkOTM0YzlmYjgzM2ZkNGNhYWEzNmYwZCIsImlhdCI6MTY2ODQwNzQ4NSwiZXhwIjoxOTgzNzY3NDg1fQ.WvDcUoelskBKTgKw0LrEwDMx0m57o-Flaz6YRvGRFpc'
+      content-type: 'application/json'

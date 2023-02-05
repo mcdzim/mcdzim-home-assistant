@@ -68,7 +68,25 @@
   action:
   - service: notify.mobile_app_pixel_4a
     data:
-      message: Left Davies
+      message: Enter Davies
+    enabled: false
+  - device_id: d6e97fceb1856a99269fd7ffa0502850
+    domain: mobile_app
+    type: notify
+    message: 'Enter Davies '
+  - type: turn_on
+    device_id: 0a5f939be7b3ea17937a7c6c469d984a
+    entity_id: light.front_door
+    domain: light
+  - delay:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+  - type: turn_off
+    device_id: 0a5f939be7b3ea17937a7c6c469d984a
+    entity_id: light.front_door
+    domain: light
   mode: single
 - id: '1664814557200'
   alias: Batteries Low
@@ -80,7 +98,7 @@
       hours: 0
       minutes: 5
       seconds: 0
-    below: 24
+    below: 15
   condition: []
   action:
   - service: notify.mobile_app_pixel_4a
@@ -134,21 +152,24 @@
     zone: zone.harare
   condition: []
   action:
-  - device_id: d6e97fceb1856a99269fd7ffa0502850
+  - device_id: 2badaa0b492b8a4f77c5afbb7f617111
     domain: mobile_app
     type: notify
-    message: Luka leaving Harare
-    title: Luka in Harare
+    message: Luka in Harare
   mode: single
 - id: '1665475699724'
   alias: Flat entrance Motion
   description: ''
   trigger:
-  - platform: device
-    type: turned_on
-    device_id: 69b1b29f4168dff2209ddf7bb0334edd
-    entity_id: switch.flat_entrance_motion_detection
-    domain: switch
+  - platform: state
+    entity_id:
+    - binary_sensor.flatlet_entrance_camera_line_crossing
+    to: 'on'
+    from: 'off'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
   condition: []
   action:
   - device_id: d6e97fceb1856a99269fd7ffa0502850
@@ -157,7 +178,7 @@
     message: Motion outside flat
   - type: turn_on
     device_id: 0a5f939be7b3ea17937a7c6c469d984a
-    entity_id: light.flatlet_light
+    entity_id: light.front_door
     domain: light
   - delay:
       hours: 0
@@ -166,7 +187,7 @@
       milliseconds: 0
   - type: turn_off
     device_id: 0a5f939be7b3ea17937a7c6c469d984a
-    entity_id: light.flatlet_light
+    entity_id: light.front_door
     domain: light
   mode: single
 - id: '1665509332997'
@@ -226,20 +247,156 @@
     data:
       message: Low voltage
   mode: single
-
-# # from automations.yaml
-# - id: '1614077768708'
-#   alias: Victron Modbus Write min SOC manual
-#   description: ''
-#   trigger:
-#   - platform: state
-#     entity_id: input_number.minimum_battery_soc
-#   condition: []
-#   action:
-#   - service: modbus.write_register
-#     data:
-#       hub: victron
-#       unit: 100
-#       address: 2901
-#       value: '{{ states.sensor.multiplus_minimal_soc_set_setpoint.state|int }}'
-#   mode: sing
+- id: auto_reload_control4
+  alias: Keep Control4 running
+  description: Check if Control4 is down
+  trigger:
+  - platform: time_pattern
+    minutes: '5'
+  condition: []
+  action:
+  - service: rest_command.reload_control4
+    data: {}
+  - service: notify.mobile_app_pixel_4a
+    data:
+      message: Control4 Frozen
+    enabled: false
+  mode: single
+- id: '1668513904847'
+  alias: 'Leave Davies '
+  description: ''
+  trigger:
+  - platform: zone
+    entity_id: device_tracker.mikes_pixel
+    zone: zone.davies
+    event: leave
+  condition: []
+  action:
+  - device_id: d6e97fceb1856a99269fd7ffa0502850
+    domain: mobile_app
+    type: notify
+    message: Leave Davies
+    enabled: false
+  - type: turn_off
+    device_id: 0a5f939be7b3ea17937a7c6c469d984a
+    entity_id: light.front_door
+    domain: light
+  - type: turn_off
+    device_id: 0a5f939be7b3ea17937a7c6c469d984a
+    entity_id: light.front_door
+    domain: light
+  - type: turn_off
+    device_id: 0a5f939be7b3ea17937a7c6c469d984a
+    entity_id: light.front_door
+    domain: light
+  mode: single
+- id: '1669656878913'
+  alias: Tag Tag1 is scanned
+  description: ''
+  trigger:
+  - platform: tag
+    tag_id: A7:44:BF:E2
+  condition: []
+  action:
+  - service: notify.mobile_app_pixel_4a
+    data:
+      message: Tag 1
+  mode: single
+- id: '1669656878913'
+  alias: Tag Tag1 is scanned
+  description: ''
+  trigger:
+  - platform: tag
+    tag_id: A7:44:BF:E2
+  condition: []
+  action:
+  - service: notify.mobile_app_pixel_4a
+    data:
+      message: Tag 1
+  mode: single
+- id: '1669840124506'
+  alias: Flatlet Off
+  description: ''
+  trigger:
+  - platform: device
+    type: turned_off
+    device_id: 80cb798c39fe0515880435c43c2d0dae
+    entity_id: switch.sonoff_10012ff502
+    domain: switch
+  - platform: device
+    device_id: 2badaa0b492b8a4f77c5afbb7f617111
+    domain: device_tracker
+    entity_id: device_tracker.mikes_pixel
+    type: leaves
+    zone: zone.davies
+  condition: []
+  action:
+  - type: turn_off
+    device_id: 0a5f939be7b3ea17937a7c6c469d984a
+    entity_id: light.flatlet_light
+    domain: light
+  - type: turn_off
+    device_id: 0a5f939be7b3ea17937a7c6c469d984a
+    entity_id: light.main_2
+    domain: light
+  - type: turn_off
+    device_id: 5bd8c45f359b3d71bf710d24408d1a24
+    entity_id: light.passage_2
+    domain: light
+  mode: single
+- id: '1669882358963'
+  alias: Cold room off for cleaning
+  description: ''
+  trigger:
+  - platform: device
+    type: turned_on
+    device_id: 95884cc3a94bd29a6b94d707f51f15b8
+    entity_id: light.coldroom_relay
+    domain: light
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 10
+  condition: []
+  action:
+  - type: turn_off
+    device_id: 95884cc3a94bd29a6b94d707f51f15b8
+    entity_id: light.coldroom_relay
+    domain: light
+  mode: single
+- id: '1669970663698'
+  alias: Prusa Finished Print
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.prusamini
+    to: idle
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+    from: printing
+  condition: []
+  action:
+  - service: notify.mobile_app_pixel_6a
+    data:
+      title: Prusa Mini
+      message: Finished Printing Part TBC
+  mode: single
+- id: '1674672291199'
+  alias: Coldroom always on
+  description: ''
+  trigger:
+  - platform: device
+    type: turned_off
+    device_id: 95884cc3a94bd29a6b94d707f51f15b8
+    entity_id: light.coldroom_relay
+    domain: light
+  condition: []
+  action:
+  - type: turn_on
+    device_id: 95884cc3a94bd29a6b94d707f51f15b8
+    entity_id: light.coldroom_relay
+    domain: light
+  mode: single
